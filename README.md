@@ -635,9 +635,9 @@ So, let’s modify the docker-compose.yml file again to fix it:
     services:
       angular-app:
         build: app
-      ports:
-        - "80:4200"
-      command: npm start
+        ports:
+          - "80:4200"
+        command: npm start
 
 
 Now run it again, and the application should work once more. The
