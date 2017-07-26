@@ -1,0 +1,71 @@
+<!doctype html>
+
+<!-- ASSIGN OUR ANGULAR MODULE -->
+<html ng-app="scotchTodo">
+<head>
+    <!-- META -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Optimize mobile viewport -->
+
+    <title>Node/Angular Todo App</title>
+
+    <!-- SCROLLS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <!-- load bootstrap -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <!-- SPELLS -->
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js"></script><!-- load angular -->
+
+    <script src="js/controllers/main.js"></script> <!-- load up our controller -->
+    <script src="js/services/todos.js"></script> <!-- load our todo service -->
+    <script src="js/core.js"></script> <!-- load our main application -->
+
+</head>
+<!-- SET THE CONTROLLER -->
+<body ng-controller="mainController">
+    <div class="container">
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="#">Todo</a>
+                <p class="navbar-text navbar-right"><span class="badge">{{ todos.length }}</span> todos</p>
+            </div>
+        </nav>
+
+        <p class="text-center" ng-show="loading">
+            <span class="fa fa-spinner fa-spin fa-3x"></span>
+        </p>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="input-group" style="margin:20px 0;" ng-repeat="todo in todos">
+                    <span class="input-group-addon input-lg">
+                        <input type="checkbox" aria-label="..." ng-click="deleteTodo(todo._id)">
+                    </span>
+                <div class="form-control input-lg">{{ todo.text }}</div>
+            </div>
+        </div>
+
+        <nav class="navbar navbar-default navbar-fixed-bottom">
+            <div class="container">
+                <!-- FORM TO CREATE TODOS -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <form>
+                        <div class="input-group" style="margin: 10px 0;">
+                                <input type="text" class="form-control input-lg" placeholder="Add todo..."
+                                       ng-model="formData.text">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-success input-lg add-todo" type="submit"
+                                        ng-click="createTodo()">Add todo</button>
+                                </span>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+</body>
+</html>

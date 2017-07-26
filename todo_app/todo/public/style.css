@@ -1,0 +1,48 @@
+html {
+    overflow-y: scroll;
+}
+
+body {
+    padding-top: 70px;
+    background: #fafafa;
+}
+
+.navbar-fixed-top {
+    background: #fff;
+    font-weight: 300;
+}
+
+.navbar-brand {
+    font-size:28px;
+    padding-top: 18px;
+    color: #205081 !important;
+}
+
+.navbar-fixed-top .badge {
+    background: #205081 !important;
+    font-size: 18px;
+    font-weight: 300;
+}
+
+.navbar-fixed-top .navbar-text {
+    color: #205081 !important;
+    font-size: 18px;
+}
+
+
+.navbar-fixed-bottom {
+    background: #205081;
+}
+
+.add-todo {
+    padding: 5px 50px;
+    font-size: 20px;
+}
+
+#todo-list {
+    margin-bottom: 30px;
+}
+
+#todo-form {
+    margin-bottom: 50px;
+}
