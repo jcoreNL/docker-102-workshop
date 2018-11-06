@@ -301,7 +301,7 @@ to. There is an image available, conveniently called `mongo`, that has
 all we need. To connect the containers to each other we have to make sure 
 that they are in the same network. To do this, we first need to create a network
 
-    docker network create --name my-awesome-network
+    docker network create my-awesome-network
 
 
 We can now start the mongo service as a forked process and name, because the name 
