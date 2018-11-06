@@ -396,7 +396,7 @@ When we look at the `db` service, it uses the image `postgres:9-alpine`, which w
 The `environment` option is for setting environment variables for that
 specific container, the same way it works for a Dockerfile. In this case
 we set the username and password for our database, and we create a
-database named `workshop`. Furthermore, we have a `ports` option for our
+database named `verypersist`. Furthermore, we have a `ports` option for our
 database, which works like the `-p` option you have when using the `docker run` command.
 Here, it maps port 5432 on the localhost to port 5432 of the container.
 
