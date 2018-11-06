@@ -449,7 +449,7 @@ already saw in the output of running `docker-compose`. In this case
 it first started the `db` container, followed by `phppgadmin`. Keep in
 mind that it did not wait for the `db` container to be ready. It will
 not wait until the application of the first container is ready, which
-means that it’s quite possible that the MongoDB wasn’t ready when
+means that it’s quite possible that the postgres database wasn’t ready when
 `phppgadmin` started. The deprecated `links` option which has the
 same syntax as `depends_on`, impacts the start up order in much the same
 way.
