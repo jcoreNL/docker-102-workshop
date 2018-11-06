@@ -298,42 +298,39 @@ get a database connection.
 
 As stated before, the application requires a MongoDB database to connect
 to. There is an image available, conveniently called `mongo`, that has
-all we need. We can start it as a forked process and name it so we can
-easily refer to it later:
+all we need. To connect the containers to each other we have to make sure 
+that they are in the same network. To do this, we first need to create a network
 
-    docker run -d --name=mongodb mongo
+    docker network create --name my-awesome-network
 
 
+We can now start the mongo service as a forked process and name, because the name 
+is used as the hostname for this container within the network:
+
+    docker run -d --net=my-awesome-network --name=mongodb mongo
+
+
+As you can see, we pass the name of our network when running the container.
 With the database up and running, we can now start our application. In
-order for it to connect to the database, we are going to use the
-`--link` argument. Furthermore, we are going to forward port 8080 to our
-localhost, as this is the port that the application is listening on.
-Execute the following command:
+order for it to connect to the database, we need to make sure that our app joins 
+the same network. Furthermore, we are going to forward port 8080 to our localhost, 
+as this is the port that the application is listening on. Execute the following command:
 
-    docker run -it -p 8080:8080 --link mongodb:mongo node/todo_app
+    docker run -it -p 8080:8080 --net=my-awesome-network node/todo_app
 
 
 If everything went correctly, you should be able to see it running on
-<http://localhost:8080>. The link option mapped the hostname mongo to
-the container mongodb. That means that inside our node/todo\_app
-container the url for the mongodb would be <http://mongodb/>.
-
-So, why does this work? The `--link` argument we gave upon starting the
-container links them together, allowing them to connect to each other on
-exposed ports. Apart from that, the NodeJS application still requires
-the address of the database, regardless of whether this is running
-inside a Docker container or somewhere else. The address is actually
-retrieved through an *environment variable* which is set when the
-container is started. In this particular example, it is
-`MONGO_PORT_27017_TCP_ADDR`, but this is specific for MongoDB. If you
-want to use another database, you will need to find out how to get its
-address.
+<http://localhost:8080>. The name option we used for starting mongo is also the hostname. 
+That means that inside our node/todo\_app container the url for the mongodb would be <http://mongodb/>.
 
 While we only linked two containers in this exercise, you could link any
 number you’d like. This method allows you to build a more complex
 infrastructure of containers that are able to connect to each other. As
 you might have guessed though, there is an easier way to achieve this
-than the manual linking performed here.
+than manually creating networks.
+
+NOTE: You may also see the option `--link` instead of creating a network to link two containers.
+But this feature is deprecated, and should not be used.
 
 ## Container orchestration with Compose
 
@@ -348,7 +345,7 @@ through several scenarios which require two or more containers.
 ### The docker-compose.yml file
 
 The docker-compose file, which uses the YAML language, describes how
-Docker needs to run the containers you want. You can for example link
+Docker needs to run the containers you want. You can for example create networks for 
 the containers, set environment variables, set the port mappings, and
 even override the `CMD` instruction of an image. All you have to do is
 run the command `docker-compose up`, and Docker runs all the containers described in your docker-compose.yml file. In this chapter we will show you all the options, and you will build a docker-compose.yml file yourself.
@@ -378,10 +375,10 @@ Create a new directory called `postgresql`, and inside the directory create a fi
         ports:
           - "80:80"
         environment:
-          - PHP_PG_ADMIN_SERVER_HOST=mydbhostname
+          - PHP_PG_ADMIN_SERVER_HOST=db
           - PHP_PG_ADMIN_SERVER_PORT=5432
-        links:
-          - db:mydbhostname
+        depends_on:
+          - db
 
 
 In this file, we see a lot of different options. Let's start from the
@@ -410,16 +407,20 @@ it uses a different syntax than the `db` service. There is no real
 specific reason for this, it is simply to show that Docker Compose
 supports two different ways to declare our environment variables.
 
-Finally, we have the option `links`, which works exactly the same as the
-`--link` option when using `docker run`. Here we declare that the `db`
-service (you need to use the service name, not the one of the
-container!) maps to the hostname `mydbhostname` of the container. The
-declared hostname is also used in the environment variable for
-phpPgAdmin for setting up the database. Another thing worth mentioning
-is that we could also remove the `links` option and use the hostname
-`db` instead. That is because Docker Compose adds all the services to
-the host. So by using link, the database is reachable using two
-different hostnames: `db` and `mydbhostname`.
+As you may have noticed, the environment variable for phppgadmin refers to the
+database hostname by using the service name `db`. This works because
+when using Compose all services automatically join the default network
+created by docker using their service name as their hostname. So both of
+our services can already reach each other. 
+
+As for the option `depends_on`, it will be explained later.
+
+In some cases you might see the option `links`, but in newer versions of Docker
+this has been deprecated. As the name suggests it can link two services, using a 
+specified hostname.
+
+You can also specify your own networks, so you can restrict access to some services for example,
+but that is out of scope for this workshop. You can find more information about it in the docker docs.
 
 ### Running the docker-compose file
 
@@ -442,15 +443,15 @@ can click *PostgreSQL*, which will show a login page. Log in using the
 credentials in the docker-compose file and you should be able to see the
 database we described in it.
 
-Another thing that is worth mentioning about the `links` option, is that
-it impacts the order in which containers start up, which you probably
+As you might have gussed is that the `depends_on` 
+impacts the order in which containers start up, which you probably
 already saw in the output of running `docker-compose`. In this case
 it first started the `db` container, followed by `phppgadmin`. Keep in
 mind that it did not wait for the `db` container to be ready. It will
 not wait until the application of the first container is ready, which
 means that it’s quite possible that the MongoDB wasn’t ready when
-`phppgadmin` started. There is also a `depends_on` option which has the
-same syntax as `links` and impacts the start up order in much the same
+`phppgadmin` started. The deprecated `links` option which has the
+same syntax as `depends_on`, impacts the start up order in much the same
 way.
 
 There is no way to tell Docker that it needs to wait for the application
@@ -476,7 +477,7 @@ will see that there are two containers, just as expected, with the
 correct port mappings. Also take a look at the container names. As you
 can see, the `container_name` option defined the container name of our
 phpPgAdmin container. The database has a generated name, which is
-something like this: *$<$directory-name$>$\_db\_1*. The directory-name
+something like this: `<directory-name>_db_1`. The directory-name
 is the name of the directory which contains your docker-compose.yml
 file. The number is just an index, because docker-compose also supports
 scaling and it could create multiple containers of the same service.
@@ -489,13 +490,13 @@ Now run the command
     docker network ls
 
 
-If you didn’t create a network yourself, you should see four of them.
+If you didn’t create a network yourself, you should see few of them.
 Three of them are defaults, which are named *host*, *bridge*, and *none*
 (see
-<https://docs.docker.com/engine/userguide/networking/#default-networks>
-for more information on them). The fourth one, named
-*$<$directory-name$>$\_default*, is created by docker-compose. Copy the
-network ID of the fourth network, and run the following command:
+<https://docs.docker.com/network>
+for more information on them). One of them named
+`<directory-name>_default`, is created by docker-compose. Copy the
+network ID of the network, and run the following command:
 
     docker network inspect <network id>
 
@@ -793,7 +794,7 @@ to verify this by running the following command:
     docker volume ls
 
 
-You should see a volume named *$<$directory-name$>$\_data*. Keep in mind
+You should see a volume named `<directory-name>_data`. Keep in mind
 that this volume is not removed when you run `docker-compose down`. Feel
 free to try this out and verify it.
 
@@ -824,7 +825,7 @@ In it, write the following:
 	  node-app:
 	    build: app
 	    environment:
-		  APP_ENVIRONMENT: 'Default'
+        APP_ENVIRONMENT: 'Default'
 
 
 Save this file, and create `docker-compose.override.yml` in the same directory with the following contents:
