@@ -334,7 +334,7 @@ But this feature is deprecated, and should not be used.
 
 ## Container orchestration with Compose
 
-Now that you have seen how the `--link` option works we can move on to
+Now that you have seen how creating a network works we can move on to
 Docker Compose. Docker Compose allows you to define a set of containers
 and some of their characteristics in a single YAML-file, by default
 called `docker-compose.yml`. Using the compose tool you can then
@@ -443,7 +443,7 @@ can click *PostgreSQL*, which will show a login page. Log in using the
 credentials in the docker-compose file and you should be able to see the
 database we described in it.
 
-As you might have gussed is that the `depends_on` 
+As you might have guessed, the `depends_on` 
 impacts the order in which containers start up, which you probably
 already saw in the output of running `docker-compose`. In this case
 it first started the `db` container, followed by `phppgadmin`. Keep in
@@ -490,7 +490,7 @@ Now run the command
     docker network ls
 
 
-If you didn’t create a network yourself, you should see few of them.
+If you didn’t create a network yourself, you should see a few of them.
 Three of them are defaults, which are named *host*, *bridge*, and *none*
 (see
 <https://docs.docker.com/network>
