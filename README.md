@@ -391,7 +391,7 @@ After that we describe all our services. The `db:` and `phppgadmin:`
 parts of the file are the names of our services. These
 can be anything you want and can be used as a reference in other parts
 of the file.
-When we look at the `db` service, it uses the image `postgres:9-alipine`, which will be pulled from the Docker Hub registry.
+When we look at the `db` service, it uses the image `postgres:9-alpine`, which will be pulled from the Docker Hub registry.
 
 The `environment` option is for setting environment variables for that
 specific container, the same way it works for a Dockerfile. In this case
