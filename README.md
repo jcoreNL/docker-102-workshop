@@ -825,7 +825,7 @@ In it, write the following:
 	  node-app:
 	    build: app
 	    environment:
-        APP_ENVIRONMENT: 'Default'
+	      APP_ENVIRONMENT: 'Default'
 
 
 Save this file, and create `docker-compose.override.yml` in the same directory with the following contents:
